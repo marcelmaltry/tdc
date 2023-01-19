@@ -12,6 +12,6 @@ template<> struct uint_half<uint32_t> { using type = uint16_t; };
 template<> struct uint_half<uint64_t> { using type = uint32_t; };
 
 template<typename T>
-using uint_half_t = uint_half<T>::type;
+using uint_half_t = typename uint_half<T>::type;
 
 }

@@ -503,6 +503,6 @@ public:
 } __attribute__((__packed__));
 
 template<size_t exp>
-struct uint_half<uint_pow2_t<exp>> { using type = uint_pow2_t<exp>::half_t; };
+struct uint_half<uint_pow2_t<exp>> { using type = typename uint_pow2_t<exp>::half_t; };
 
 } // namespace tdc
