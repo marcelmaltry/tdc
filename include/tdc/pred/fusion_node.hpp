@@ -19,16 +19,17 @@ template<std::totally_ordered key_t = uint64_t, size_t m_max_keys = 8>
 class FusionNode {
 private:
     using Internals = internal::FusionNodeInternals<key_t, m_max_keys, false>;
-    
+
     using mask_t = typename Internals::mask_t;
     using matrix_t = typename Internals::matrix_t;
 
-    mask_t   m_mask;
-    matrix_t m_branch, m_free;
+    key_t    m_key_[m_max_keys];
+    mask_t   m_mask_;
+    matrix_t m_branch_, m_free_;
 
 public:
     /// \brief Constructs an empty compressed trie.
-    FusionNode(): m_mask(0) {
+    FusionNode(): m_mask_(0) {
     }
 
     /// \brief Constructs a compressed trie for the given keys.
@@ -42,9 +43,10 @@ public:
     template<IndexAccessTo<key_t> keyarray_t>
     FusionNode(const keyarray_t& keys, const size_t num) {
         auto fnode8 = Internals::template construct<key_t>(keys, num);
-        m_mask = std::get<0>(fnode8);
-        m_branch = std::get<1>(fnode8);
-        m_free = std::get<2>(fnode8);
+        m_mask_ = std::get<0>(fnode8);
+        m_branch_ = std::get<1>(fnode8);
+        m_free_ = std::get<2>(fnode8);
+        std::copy(keys, keys + num, m_key_);
     }
 
     /// \brief Finds the rank of the predecessor of the specified key in the compressed trie.
@@ -52,8 +54,20 @@ public:
     /// \param x the key in question
     template<IndexAccessTo<key_t> keyarray_t>
     PosResult predecessor(const keyarray_t& keys, const key_t x) const {
-        return Internals::predecessor(keys, x, m_mask, m_branch, m_free);
+        return Internals::predecessor(keys, x, m_mask_, m_branch_, m_free_);
     }
+
+    PosResult predecessor(const key_t x) const {
+        return Internals::predecessor(m_key_, x, m_mask_, m_branch_, m_free_);
+    }
+
+    const key_t * m_key() const { return m_key_; }
+
+    const mask_t m_mask() const { return m_mask_; }
+
+    const matrix_t m_branch() const { return m_branch_; }
+
+    const matrix_t m_free() const { return m_free_; }
 };
 
 }} // namespace tdc::pred
