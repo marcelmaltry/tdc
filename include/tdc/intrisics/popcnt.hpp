@@ -19,6 +19,11 @@ constexpr size_t popcnt(const uint32_t& x) {
 }
 
 template<>
+constexpr size_t popcnt(const int& x) {
+    return __builtin_popcount(x);
+}
+
+template<>
 constexpr size_t popcnt(const uint64_t& x) {
     return __builtin_popcountll(x);
 }
